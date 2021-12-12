@@ -11,7 +11,7 @@ import java.util.stream.StreamSupport;
 
 public class SolutionDayFive {
     public static void main(String[] args) {
-        try (Stream<String> a = Utilities.readInFile("src/day5/input");) {
+        try (Stream<String> a = Utilities.readInFile("src/day5/input")) {
             List<Object> kTaskOne = a.map(x -> new Line(
                                     new Point(
                                             Integer.parseInt(x.split(" -> ")[0].split(",")[0]),
@@ -22,14 +22,12 @@ public class SolutionDayFive {
                                             Integer.parseInt(x.split(" -> ")[1].split(",")[1]))
                             )
                     ).filter(q -> Objects.equals(q.p1().x(), q.p2().x()) || Objects.equals(q.p1().y(), q.p2().y()))
-                    .mapMulti((x, consumer) -> {
-                        getPointsOnLine(x).forEach(consumer);
-                    }).toList();
+                    .mapMulti((x, consumer) -> getPointsOnLine(x).forEach(consumer)).toList();
             printSolution(kTaskOne);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try (Stream<String> a = Utilities.readInFile("src/day5/input");) {
+        try (Stream<String> a = Utilities.readInFile("src/day5/input")) {
             List<Object> kTaskOne = a.map(x -> new Line(
                             new Point(
                                     Integer.parseInt(x.split(" -> ")[0].split(",")[0]),
@@ -39,9 +37,7 @@ public class SolutionDayFive {
                                     Integer.parseInt(x.split(" -> ")[1].split(",")[0]),
                                     Integer.parseInt(x.split(" -> ")[1].split(",")[1]))
                     )
-            ).mapMulti((x, consumer) -> {
-                getPointsOnLine(x).forEach(consumer);
-            }).toList();
+            ).mapMulti((x, consumer) -> getPointsOnLine(x).forEach(consumer)).toList();
             printSolution(kTaskOne);
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,16 +54,8 @@ public class SolutionDayFive {
 
     public static List<Point> getPointsOnLine(Line l) {
         final List<Point> list = new ArrayList<>();
-        Stream.of(l).parallel().filter(x -> Objects.equals(x.p2().x(), x.p1().x())).forEach(x -> {
-            IntStream.range(Math.min(x.p1().y(), x.p2().y()), Math.max(x.p1().y(), x.p2().y()) + 1).forEach(k -> {
-                list.add(new Point(x.p1().x(), k));
-            });
-        });
-        Stream.of(l).parallel().filter(x -> Objects.equals(x.p2().y(), x.p1().y())).forEach(x -> {
-            IntStream.range(Math.min(x.p1().x(), x.p2().x()), Math.max(x.p1().x(), x.p2().x()) + 1).forEach(k -> {
-                list.add(new Point(k, x.p1().y()));
-            });
-        });
+        Stream.of(l).filter(x -> Objects.equals(x.p2().x(), x.p1().x())).forEach(x -> IntStream.range(Math.min(x.p1().y(), x.p2().y()), Math.max(x.p1().y(), x.p2().y()) + 1).forEach(k -> list.add(new Point(x.p1().x(), k))));
+        Stream.of(l).filter(x -> Objects.equals(x.p2().y(), x.p1().y())).forEach(x -> IntStream.range(Math.min(x.p1().x(), x.p2().x()), Math.max(x.p1().x(), x.p2().x()) + 1).forEach(k -> list.add(new Point(k, x.p1().y()))));
         Stream.of(l)
                 .filter(x -> !Objects.equals(x.p2().y(), x.p1().y()) && !Objects.equals(x.p2().x(), x.p1().x()))
                 .forEach(x -> {
@@ -77,19 +65,6 @@ public class SolutionDayFive {
                     IntStream ay =
                             IntStream.range(Math.min(x.p1().y(), x.p2().y()), Math.max(x.p1().y(), x.p2().y()) + 1);
                     ay = x.p1().y() > x.p2().y() ? ay.map(i -> (x.p1().y() + 1) - i + x.p2().y() - 1) : ay;
-                    System.out.println(Arrays.toString(
-                            IntStream.range(Math.min(x.p1().x(), x.p2().x()), Math.max(x.p1().x(), x.p2().x()) + 1)
-                                    .toArray()));
-                    System.out.println(Arrays.toString(
-                            IntStream.range(Math.min(x.p1().y(), x.p2().y()), Math.max(x.p1().y(), x.p2().y() + 1))
-                                    .toArray()));
-                    ay = ay.peek(q -> {
-                        System.out.print(q + " ");
-                    });
-                    System.out.println();
-                    ax = ax.peek(q -> {
-                        System.out.print(q + " ");
-                    });
                     Spliterator<Integer> aS = ax.spliterator();
                     Spliterator<Integer> aB = ay.spliterator();
                     int characteristics = aS.characteristics() & aB.characteristics() &
@@ -101,7 +76,7 @@ public class SolutionDayFive {
                     BiFunction<Integer, Integer, Integer[]> k = (a, b) -> new Integer[] {a, b};
                     Iterator<Integer> aI = Spliterators.iterator(aS);
                     Iterator<Integer> bI = Spliterators.iterator(aB);
-                    Iterator<Integer[]> cI = new Iterator<Integer[]>() {
+                    Iterator<Integer[]> cI = new Iterator<>() {
                         @Override
                         public boolean hasNext() {
                             return aI.hasNext() && bI.hasNext();
@@ -116,11 +91,7 @@ public class SolutionDayFive {
                     Stream<Integer[]> stream =
                             (ax.isParallel() || ay.isParallel()) ? StreamSupport.stream(split, true) :
                                     StreamSupport.stream(split, false);
-                    stream.forEach(q -> {
-                        System.out.println(new Point(q[0], q[1]));
-                        list.add(new Point(q[0], q[1]));
-                    });
-                    System.out.println();
+                    stream.forEach(q -> list.add(new Point(q[0], q[1])));
                 });
         return list;
     }
