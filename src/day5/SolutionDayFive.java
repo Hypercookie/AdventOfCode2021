@@ -12,37 +12,34 @@ import java.util.stream.StreamSupport;
 public class SolutionDayFive {
     public static void main(String[] args) {
         try (Stream<String> a = Utilities.readInFile("src/day5/input")) {
-            List<Object> kTaskOne = a.map(x -> new Line(
-                                    new Point(
-                                            Integer.parseInt(x.split(" -> ")[0].split(",")[0]),
-                                            Integer.parseInt(x.split(" -> ")[0].split(",")[1]))
-                                    ,
-                                    new Point(
-                                            Integer.parseInt(x.split(" -> ")[1].split(",")[0]),
-                                            Integer.parseInt(x.split(" -> ")[1].split(",")[1]))
-                            )
-                    ).filter(q -> Objects.equals(q.p1().x(), q.p2().x()) || Objects.equals(q.p1().y(), q.p2().y()))
+            List<Object> kTaskOne = toLineStream(a).stream().parallel()
+                    .filter(q -> Objects.equals(q.p1().x(), q.p2().x()) || Objects.equals(q.p1().y(), q.p2().y()))
                     .mapMulti((x, consumer) -> getPointsOnLine(x).forEach(consumer)).toList();
             printSolution(kTaskOne);
         } catch (IOException e) {
             e.printStackTrace();
         }
         try (Stream<String> a = Utilities.readInFile("src/day5/input")) {
-            List<Object> kTaskOne = a.map(x -> new Line(
-                            new Point(
-                                    Integer.parseInt(x.split(" -> ")[0].split(",")[0]),
-                                    Integer.parseInt(x.split(" -> ")[0].split(",")[1]))
-                            ,
-                            new Point(
-                                    Integer.parseInt(x.split(" -> ")[1].split(",")[0]),
-                                    Integer.parseInt(x.split(" -> ")[1].split(",")[1]))
-                    )
-            ).mapMulti((x, consumer) -> getPointsOnLine(x).forEach(consumer)).toList();
+            List<Object> kTaskOne =
+                    toLineStream(a).stream().parallel().mapMulti((x, consumer) -> getPointsOnLine(x).forEach(consumer)).toList();
             printSolution(kTaskOne);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private static List<Line> toLineStream(Stream<String> a) {
+        return a.map(x -> new Line(
+                        new Point(
+                                Integer.parseInt(x.split(" -> ")[0].split(",")[0]),
+                                Integer.parseInt(x.split(" -> ")[0].split(",")[1]))
+                        ,
+                        new Point(
+                                Integer.parseInt(x.split(" -> ")[1].split(",")[0]),
+                                Integer.parseInt(x.split(" -> ")[1].split(",")[1]))
+                )
+        ).toList();
     }
 
     private static void printSolution(List<Object> kTaskOne) {
@@ -54,8 +51,12 @@ public class SolutionDayFive {
 
     public static List<Point> getPointsOnLine(Line l) {
         final List<Point> list = new ArrayList<>();
-        Stream.of(l).filter(x -> Objects.equals(x.p2().x(), x.p1().x())).forEach(x -> IntStream.range(Math.min(x.p1().y(), x.p2().y()), Math.max(x.p1().y(), x.p2().y()) + 1).forEach(k -> list.add(new Point(x.p1().x(), k))));
-        Stream.of(l).filter(x -> Objects.equals(x.p2().y(), x.p1().y())).forEach(x -> IntStream.range(Math.min(x.p1().x(), x.p2().x()), Math.max(x.p1().x(), x.p2().x()) + 1).forEach(k -> list.add(new Point(k, x.p1().y()))));
+        Stream.of(l).filter(x -> Objects.equals(x.p2().x(), x.p1().x())).forEach(
+                x -> IntStream.range(Math.min(x.p1().y(), x.p2().y()), Math.max(x.p1().y(), x.p2().y()) + 1)
+                        .forEach(k -> list.add(new Point(x.p1().x(), k))));
+        Stream.of(l).filter(x -> Objects.equals(x.p2().y(), x.p1().y())).forEach(
+                x -> IntStream.range(Math.min(x.p1().x(), x.p2().x()), Math.max(x.p1().x(), x.p2().x()) + 1)
+                        .forEach(k -> list.add(new Point(k, x.p1().y()))));
         Stream.of(l)
                 .filter(x -> !Objects.equals(x.p2().y(), x.p1().y()) && !Objects.equals(x.p2().x(), x.p1().x()))
                 .forEach(x -> {
