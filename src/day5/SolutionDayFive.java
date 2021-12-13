@@ -46,7 +46,7 @@ public class SolutionDayFive {
         System.out.println(
                 kTaskOne.stream().map(x -> new Object[] {Collections.frequency(kTaskOne, x), x})
                         .filter(u -> (int) u[0] > 1)
-                        .map(u -> u[1]).unordered().distinct().count()); //<- THIS IS FUCKING SLOW
+                        .map(u -> u[1]).unordered().sequential().distinct().count()); //<- THIS IS FUCKING SLOW
     }
 
     public static List<Point> getPointsOnLine(Line l) {
