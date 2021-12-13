@@ -16,11 +16,14 @@ public class SolutionDaySeven {
             System.out.println(
                     Arrays.stream(ar).map(x -> Math.abs(ar[(int) Math.ceil(ar.length / 2.0)] - x)).reduce(Integer::sum)
                             .orElse(0));
-            int targetC =
-                    Math.min((int) Math.ceil(Arrays.stream(ar).reduce(Integer::sum).orElse(0) / (double) ar.length),
-                            (int) Math.floor(Arrays.stream(ar).reduce(Integer::sum).orElse(0) / (double) ar.length));
-            System.out.println(Arrays.stream(ar).map(x -> (Math.abs(targetC - x) * (Math.abs(targetC - x) + 1)) / 2)
-                    .reduce(Integer::sum).orElse(0));
+            int targetC = (int) Math.ceil(Arrays.stream(ar).reduce(Integer::sum).orElse(0) / (double) ar.length);
+            int targetF = (int) Math.floor(Arrays.stream(ar).reduce(Integer::sum).orElse(0) / (double) ar.length);
+
+            System.out.println(
+                    Math.min(Arrays.stream(ar).map(x -> (Math.abs(targetC - x) * (Math.abs(targetC - x) + 1)) / 2)
+                                    .reduce(Integer::sum).orElse(0),
+                            Arrays.stream(ar).map(x -> (Math.abs(targetF - x) * (Math.abs(targetF - x) + 1)) / 2)
+                                    .reduce(Integer::sum).orElse(0)));
         } catch (IOException e) {
             e.printStackTrace();
         }
