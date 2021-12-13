@@ -43,6 +43,3 @@ public class SolutionDaySix {
     }
 
 }
-
-record Lanternfish(int timer) {
-}
